@@ -20,7 +20,7 @@ export const Default = Template.bind({});
 
 export const HideWeekNumber = Template.bind({});
 HideWeekNumber.args = {
-  hideWeekNumber: true,
+  showWeekNumber: false,
 };
 
 export const PrintLongWeekdays = Template.bind({});
@@ -31,14 +31,16 @@ PrintLongWeekdays.args = {
 export const EnglishLocale = Template.bind({});
 EnglishLocale.args = {
   locale: enUS,
+  nextMonthLabel: "Next month",
+  previousMonthLabel: "Previous month",
 };
 
-export const MinDate = Template.bind({});
-MinDate.args = {
-  minDate: addYears(new Date(), 1),
+export const StartDate1YearInFuture = Template.bind({});
+StartDate1YearInFuture.args = {
+  start: addYears(new Date(), 1),
 };
 
-export const MaxDate = Template.bind({});
-MaxDate.args = {
-  maxDate: new Date(),
+export const EndDateToday = Template.bind({});
+EndDateToday.args = {
+  end: new Date(),
 };
