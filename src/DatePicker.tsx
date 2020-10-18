@@ -1,13 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useReducer } from "react";
 import { Locale } from "date-fns";
 import { sv } from "date-fns/locale";
-import { DatePickerProvider } from "./DatePickerContext";
-import { useState } from "./hooks";
-import SelectMonth from "./SelectMonth";
-import SelectYear from "./SelectYear";
-import ButtonMonth, { Direction } from "./ButtonMonth";
-import TableHead from "./TableHead";
-import TableBody from "./TableBody";
+import { DatePickerContext } from "./DatePickerContext";
+import { datePickerReducer } from "./state";
+import Controls from "./Controls";
+import Calendar from "./Calendar";
+import styles from "./DatePicker.module.css";
 
 export interface DatePickerProps {
   /**
@@ -37,9 +35,21 @@ export interface DatePickerProps {
    * Hide week numbers in the month grid
    */
   showWeekNumber: boolean;
-
+  /**
+   * Use transitions or not
+   */
+  transitions: boolean;
+  /**
+   * Label for next month button
+   */
   nextMonthLabel: string;
+  /**
+   * Label for previous month button
+   */
   previousMonthLabel: string;
+  /**
+   * Label week column in calendar
+   */
   weekLabel: string;
 }
 
@@ -53,48 +63,35 @@ const DatePicker: React.FC<DatePickerProps> = ({
   nextMonthLabel = "Nästa månad",
   previousMonthLabel = "Föregående månad",
   weekLabel = "V.",
+  transitions = true,
 }) => {
-  const {
-    state: { activeDate },
-    reset,
-  } = useState();
+  const [state, dispatch] = useReducer(datePickerReducer, {
+    displayDate: start,
+    start,
+    end,
+    locale,
+    printLongWeekdays,
+    showWeekNumber,
+    transitions,
+    activeDate: undefined,
+  });
 
   useEffect(() => {
-    reset({
-      displayDate: start,
-      start,
-      end,
-      locale,
-      showWeekNumber,
-      printLongWeekdays,
-    });
-  }, [reset, start, end, locale, showWeekNumber, printLongWeekdays]);
-
-  useEffect(() => {
-    if (activeDate) {
-      onChange(activeDate);
+    if (state.activeDate) {
+      onChange(state.activeDate);
     }
-  }, [activeDate, onChange]);
+  }, [state.activeDate, onChange]);
 
   return (
-    <DatePickerProvider>
-      <div>
-        <div>
-          <ButtonMonth direction={Direction.Previous}>
-            {previousMonthLabel}
-          </ButtonMonth>
-          <SelectYear />
-          <SelectMonth />
-          <ButtonMonth direction={Direction.Next}>{nextMonthLabel}</ButtonMonth>
-        </div>
-        <div>
-          <table>
-            <TableHead weekLabel={weekLabel} />
-            <TableBody />
-          </table>
-        </div>
+    <DatePickerContext.Provider value={{ state, dispatch }}>
+      <div className={styles.DatePicker}>
+        <Controls
+          nextMonthLabel={nextMonthLabel}
+          previousMonthLabel={previousMonthLabel}
+        />
+        <Calendar weekLabel={weekLabel} />
       </div>
-    </DatePickerProvider>
+    </DatePickerContext.Provider>
   );
 };
 

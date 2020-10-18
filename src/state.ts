@@ -1,4 +1,3 @@
-import React, { useReducer, Dispatch, FC, createContext } from "react";
 import { sv } from "date-fns/locale";
 
 export type DatePickerState = {
@@ -8,12 +7,14 @@ export type DatePickerState = {
   displayDate: Date;
   activeDate?: Date;
   showWeekNumber: boolean;
+  transitions: boolean;
   printLongWeekdays: boolean;
 };
 
 export enum ActionTypes {
   Reset = "RESET",
   SetDisplayDate = "SET_DISPLAY_DATE",
+  SetActiveDate = "SET_ACTIVE_DATE",
 }
 
 type ActionReset = {
@@ -28,19 +29,30 @@ type ActionSetDisplayDate = {
   };
 };
 
-type DatePickerAction = ActionReset | ActionSetDisplayDate;
+type ActionSetActiveDate = {
+  type: ActionTypes.SetActiveDate;
+  payload: {
+    activeDate: Date;
+  };
+};
 
-const datePickerIntitialState: DatePickerState = {
+export type DatePickerAction =
+  | ActionReset
+  | ActionSetDisplayDate
+  | ActionSetActiveDate;
+
+export const datePickerIntitialState: DatePickerState = {
   displayDate: new Date(),
   start: new Date(),
   end: new Date(),
   locale: sv,
   showWeekNumber: true,
   printLongWeekdays: false,
+  transitions: false,
   activeDate: undefined,
 };
 
-const datePickerReducer = (
+export const datePickerReducer = (
   state: DatePickerState,
   action: DatePickerAction
 ): DatePickerState => {
@@ -57,28 +69,12 @@ const datePickerReducer = (
         ...state,
         displayDate: action.payload.displayDate,
       };
+    case ActionTypes.SetActiveDate:
+      return {
+        ...state,
+        activeDate: action.payload.activeDate,
+      };
     default:
       return state;
   }
-};
-
-export const DatePickerContext = createContext<{
-  state: DatePickerState;
-  dispatch: Dispatch<DatePickerAction>;
-}>({
-  state: datePickerIntitialState,
-  dispatch: () => null,
-});
-
-export const DatePickerProvider: FC = ({ children }) => {
-  const [state, dispatch] = useReducer(
-    datePickerReducer,
-    datePickerIntitialState
-  );
-
-  return (
-    <DatePickerContext.Provider value={{ state, dispatch }}>
-      {children}
-    </DatePickerContext.Provider>
-  );
 };

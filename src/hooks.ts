@@ -1,9 +1,6 @@
 import { useContext } from "react";
-import {
-  DatePickerContext,
-  DatePickerState,
-  ActionTypes,
-} from "./DatePickerContext";
+import { DatePickerContext } from "./DatePickerContext";
+import { DatePickerState, ActionTypes } from "./state";
 
 export const useState = () => {
   const { state, dispatch } = useContext(DatePickerContext);
@@ -16,5 +13,9 @@ export const useState = () => {
     dispatch({ type: ActionTypes.SetDisplayDate, payload: { displayDate } });
   };
 
-  return { state, reset, setDisplayDate };
+  const setActiveDate = (activeDate: Date): void => {
+    dispatch({ type: ActionTypes.SetActiveDate, payload: { activeDate } });
+  };
+
+  return { state, reset, setDisplayDate, setActiveDate };
 };

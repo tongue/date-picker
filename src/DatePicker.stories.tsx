@@ -33,6 +33,7 @@ EnglishLocale.args = {
   locale: enUS,
   nextMonthLabel: "Next month",
   previousMonthLabel: "Previous month",
+  weekLabel: "W.",
 };
 
 export const StartDate1YearInFuture = Template.bind({});
@@ -43,4 +44,9 @@ StartDate1YearInFuture.args = {
 export const EndDateToday = Template.bind({});
 EndDateToday.args = {
   end: new Date(),
+};
+
+export const NoTransitions = Template.bind({});
+NoTransitions.args = {
+  transitions: false,
 };
