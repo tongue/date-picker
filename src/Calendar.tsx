@@ -47,7 +47,7 @@ const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
   // actual day names, so we get a new array that looks like this:
   // `["monday", "tuesday", ...]` which we then return instead of the array of
   // date objects.
-  const dayNames = eachDayOfInterval({
+  const dayNames: string[] = eachDayOfInterval({
     start: startOfWeek(new Date()),
     end: endOfWeek(new Date()),
   }).map((day) => format(day, printLongWeekdays ? "iiii" : "iii", { locale }));
@@ -58,7 +58,7 @@ const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
   // to an array of all the days within the week Date object that we get
   // for each iteration. So we get an array that looks like this
   // `[[Date, Date, ...], [Date, Date, ...], [Date, Date, ...], ...]
-  const daysOfMonthByWeek = eachWeekOfInterval({
+  const daysOfMonthByWeek: Date[][] = eachWeekOfInterval({
     start: startOfMonth(displayDate),
     end: endOfMonth(displayDate),
   }).map((week) =>

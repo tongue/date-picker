@@ -20,14 +20,12 @@ const Select: FC<SelectProps> = ({
   disabled,
   onChange,
   value,
-}) => {
-  return (
-    <select name={name} disabled={disabled} onChange={onChange} value={value}>
-      {options.map((option) => (
-        <option key={option.value} {...option} />
-      ))}
-    </select>
-  );
-};
+}) => (
+  <select name={name} disabled={disabled} onChange={onChange} value={value}>
+    {options.map((option) => (
+      <option key={option.value} {...option} />
+    ))}
+  </select>
+);
 
 export default Select;
