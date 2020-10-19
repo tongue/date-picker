@@ -2,7 +2,7 @@ import React from "react";
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 import { Story, Meta } from "@storybook/react/types-6-0";
 
-import DatePicker, { DatePickerProps } from "./DatePicker";
+import DatePicker, { DatePickerProps } from ".";
 import { enUS } from "date-fns/locale";
 import { addYears } from "date-fns";
 
