@@ -63,8 +63,10 @@ const DatePicker: React.FC<DatePickerProps> = ({
   nextMonthLabel = "Nästa månad",
   previousMonthLabel = "Föregående månad",
   weekLabel = "V.",
-  transitions = true,
+  transitions = false,
 }) => {
+  // initialize our state manangement with the passed in props that is part
+  // of the actual state
   const [state, dispatch] = useReducer(datePickerReducer, {
     displayDate: start,
     start,
@@ -76,6 +78,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
     activeDate: undefined,
   });
 
+  // if activeDate ever changes and it's changed to a value that is not
+  // undefined. We call the onChange method passing along the activeDate.
   useEffect(() => {
     if (state.activeDate) {
       onChange(state.activeDate);

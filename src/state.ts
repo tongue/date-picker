@@ -11,17 +11,26 @@ export type DatePickerState = {
   printLongWeekdays: boolean;
 };
 
+// These are the current possible actions we can perform on our state
 export enum ActionTypes {
   Reset = "RESET",
   SetDisplayDate = "SET_DISPLAY_DATE",
   SetActiveDate = "SET_ACTIVE_DATE",
 }
 
+// In our actions we use whats called "Discriminating Unions".
+// Which in its simples form is a type check where we can set
+// different expected types based on certain values.
+// So depending on what "type" of action you want to perform
+// the typechecker knows which "payload" to expect.
+
+// The reset action is used to reset all the datepicker props to new values
 type ActionReset = {
   type: ActionTypes.Reset;
   payload: DatePickerState;
 };
 
+// The setDisplayDate action is used to set the current displayDate
 type ActionSetDisplayDate = {
   type: ActionTypes.SetDisplayDate;
   payload: {
@@ -29,6 +38,7 @@ type ActionSetDisplayDate = {
   };
 };
 
+// The setActiveDate action is used to set the current activeDate
 type ActionSetActiveDate = {
   type: ActionTypes.SetActiveDate;
   payload: {
@@ -36,11 +46,13 @@ type ActionSetActiveDate = {
   };
 };
 
+// combine all our action types to one union action type.
 export type DatePickerAction =
   | ActionReset
   | ActionSetDisplayDate
   | ActionSetActiveDate;
 
+// the default state of our app, will most likely always be overwritten
 export const datePickerIntitialState: DatePickerState = {
   displayDate: new Date(),
   start: new Date(),
@@ -52,17 +64,28 @@ export const datePickerIntitialState: DatePickerState = {
   activeDate: undefined,
 };
 
+// This is our state management reducer.
+// The reducer is completely based around "immutability", it performs
+// actions upon our state, but it never mutates the state. It always returns
+// a new copy of our modified state instead.
+// We do this because we don't want anybody to change our state without
+// using our set actions. And thusly making statemanagent more clear in the
+// long run as our component grows.
 export const datePickerReducer = (
   state: DatePickerState,
   action: DatePickerAction
 ): DatePickerState => {
+  // So based on what action we recieve (you can think of actions like events or messages),
+  // we will create a new object spread out the old state object in that new object.
+  // And the overwrite the values that we need to change depending on the action.
+  // And so we have created a new object with all the state properties with the update
+  // we wanted. But we have not mutated the previous version of the state. So that
+  // is still accessible to us. If we want to do something with it.
   switch (action.type) {
     case ActionTypes.Reset:
       return {
         ...state,
-        start: action.payload.start,
-        end: action.payload.end,
-        locale: action.payload.locale,
+        ...action.payload,
       };
     case ActionTypes.SetDisplayDate:
       return {

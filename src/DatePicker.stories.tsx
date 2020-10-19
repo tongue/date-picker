@@ -46,7 +46,7 @@ EndDateToday.args = {
   end: new Date(),
 };
 
-export const NoTransitions = Template.bind({});
-NoTransitions.args = {
+export const WithTransitions = Template.bind({});
+WithTransitions.args = {
   transitions: false,
 };

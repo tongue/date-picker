@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import Select from "./Select";
+import Select, { SelectOption } from "./Select";
 import {
   getYear,
   setYear,
@@ -32,15 +32,16 @@ const Controls: FC<ControlsProps> = ({
   nextMonthLabel,
   previousMonthLabel,
 }) => {
+  // we use our custom hook `useState` which exposes our component state
+  // and a function to update the `displayDate`
   const {
     state: { displayDate, start, end, locale },
     setDisplayDate,
   } = useState();
 
-  // an array of Date objects for all the available years within the
-  // start and end dates. If the start and end dates year is the same, we return
-  // the start date in an array
-  const yearOptions = eachYearOfInterval({
+  // take all years within the interval of our start and end dates.
+  // iterate (map) over that and describe our select options with it.
+  const yearOptions: SelectOption[] = eachYearOfInterval({
     start: startOfYear(start),
     end: endOfYear(end),
   }).map((year) => ({
@@ -53,8 +54,10 @@ const Controls: FC<ControlsProps> = ({
     end: endOfMonth(end),
   };
 
-  // Get all the months in the year of the current date
-  const monthOptions = eachMonthOfInterval({
+  // take all the months in the year of the current date
+  // then iterate (map) over all those months, creating a new object
+  // where we describe our select options.
+  const monthOptions: SelectOption[] = eachMonthOfInterval({
     start: startOfYear(new Date()),
     end: endOfYear(new Date()),
   }).map((month: Date) => ({

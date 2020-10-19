@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 
-type SelectOption = {
+export type SelectOption = {
   value: string | number;
   disabled?: boolean;
   children: string | number;

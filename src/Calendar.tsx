@@ -25,6 +25,8 @@ interface CalendarProps {
 }
 
 const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
+  // we use our custom hook `useState` which exposes our component state
+  // and a function to update the `activeDate`
   const {
     state: {
       activeDate,
@@ -39,8 +41,8 @@ const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
     setActiveDate,
   } = useState();
 
-  // First we get an array of Date objects for each day within a the current week,
-  // So it looks like this: `[Date, Date, Date, Date, Date, Date, Date]`
+  // we take an array of Date objects for each day within a the current week,
+  // So it looks like this: `[Date, Date, ...]`
   // We then iterate (map) over this array, and convert the Date objects to the
   // actual day names, so we get a new array that looks like this:
   // `["monday", "tuesday", ...]` which we then return instead of the array of
@@ -50,12 +52,12 @@ const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
     end: endOfWeek(new Date()),
   }).map((day) => format(day, printLongWeekdays ? "iiii" : "iii", { locale }));
 
-  // First we get an array of Date objects for each week within our wanted month.
+  // we take an array of Date objects for each week within our wanted month.
   // So it looks something like this: [`Date`, `Date`, `Date`, `Date`]
   // We then iterate (map) over that array converting the `Date` object
   // to an array of all the days within the week Date object that we get
   // for each iteration. So we get an array that looks like this
-  // `[[Date, Date, ...], [Date, Date, ...], [Date, Date, ...], [Date, Date, ...]]
+  // `[[Date, Date, ...], [Date, Date, ...], [Date, Date, ...], ...]
   const daysOfMonthByWeek = eachWeekOfInterval({
     start: startOfMonth(displayDate),
     end: endOfMonth(displayDate),
@@ -67,6 +69,8 @@ const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
     setActiveDate(setDay(displayDate, parseInt(event.currentTarget.value, 10)));
   };
 
+  // this function ensures that when a transition is complete the CSSTransition
+  // component knows it.
   const onTransitionEnd = (node: HTMLElement, done: () => void) => {
     node.addEventListener("transitionend", done, false);
   };
