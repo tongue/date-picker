@@ -1,10 +1,13 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useReducer, Component } from "react";
 import { Locale } from "date-fns";
 import { sv } from "date-fns/locale";
 import {
-  datePickerReducer,
   DatePickerStateContext,
   DatePickerDispatchContext,
+  datePickerReducer,
+  WeekdayFormat,
+  WeekdayFormatOptions,
+  CalendarType,
 } from "./state";
 import Controls from "./Controls";
 import Calendar from "./Calendar";
@@ -13,7 +16,7 @@ import styles from "./DatePicker.module.css";
 export interface DatePickerProps {
   /**
    * Change handler, fires everytime a new date
-   * has been selected.
+   * is selected.
    */
   onChange: (date: Date) => void;
   /**
@@ -33,11 +36,11 @@ export interface DatePickerProps {
   /**
    * Print long weekday names in the week grid
    */
-  printLongWeekdays: boolean;
+  weekdayFormat: WeekdayFormat;
   /**
    * Hide week numbers in the month grid
    */
-  showWeekNumber: boolean;
+  calendarType: CalendarType;
   /**
    * Label for next month button
    */
@@ -57,8 +60,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
   start = new Date(),
   end = new Date(new Date().setFullYear(new Date().getFullYear() + 5)),
   locale = sv,
-  printLongWeekdays = false,
-  showWeekNumber = true,
+  weekdayFormat = "ALL_CHARACTERS",
+  calendarType = CalendarType.Default,
   nextMonthLabel = "Nästa månad",
   previousMonthLabel = "Föregående månad",
   weekLabel = "V.",
@@ -70,8 +73,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
     start,
     end,
     locale,
-    printLongWeekdays,
-    showWeekNumber,
+    weekdayFormat,
+    calendarType,
     activeDate: undefined,
   });
 
