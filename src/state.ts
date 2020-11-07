@@ -2,16 +2,18 @@ import { useContext } from "react";
 import { sv } from "date-fns/locale";
 import { DatePickerContext } from "./DatePickerContext";
 
-export type DatePickerState = {
-  start: Date;
-  end: Date;
-  locale: Locale;
-  displayDate: Date;
-  activeDate?: Date;
-  showWeekNumber: boolean;
-  transitions: boolean;
-  printLongWeekdays: boolean;
-};
+export enum WeekdayFormatOptions {
+  OneCharacter = "ONE_CHARACTER",
+  TwoCharacters = "TWO_CHARACTERS",
+  ThreeCharacters = "THREE_CHARACTERS",
+  AllCharacters = "ALL_CHARACTERS",
+}
+
+export type WeekdayFormat =
+  | "ONE_CHARACTER"
+  | "TWO_CHARACTERS"
+  | "THREE_CHARACTERS"
+  | "ALL_CHARACTERS";
 
 // These are the current possible actions we can perform on our state
 export enum ActionTypes {
@@ -19,6 +21,24 @@ export enum ActionTypes {
   SetDisplayDate = "SET_DISPLAY_DATE",
   SetActiveDate = "SET_ACTIVE_DATE",
 }
+
+export enum CalendarType {
+  Default,
+  WithoutWeekNumber,
+  WithoutDayName,
+  WithoutWeekNumberAndDayName,
+}
+
+export type DatePickerState = {
+  start: Date;
+  end: Date;
+  locale: Locale;
+  displayDate: Date;
+  activeDate?: Date;
+  calendarType: CalendarType;
+  transitions: boolean;
+  weekdayFormat: WeekdayFormat;
+};
 
 // In our actions we use whats called "Discriminating Unions".
 // Which in its simples form is a type check where we can set
@@ -60,8 +80,8 @@ export const datePickerIntitialState: DatePickerState = {
   start: new Date(),
   end: new Date(),
   locale: sv,
-  showWeekNumber: true,
-  printLongWeekdays: false,
+  calendarType: CalendarType.Default,
+  weekdayFormat: "ALL_CHARACTERS",
   transitions: false,
   activeDate: undefined,
 };

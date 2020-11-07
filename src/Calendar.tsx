@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { useState } from "./state";
+import { useState, CalendarType, WeekdayFormatOptions } from "./state";
 import {
   setDay,
   getDay,
@@ -24,6 +24,13 @@ interface CalendarProps {
   weekLabel: string;
 }
 
+const weekdayFormats = {
+  [WeekdayFormatOptions.OneCharacter]: "iiiii",
+  [WeekdayFormatOptions.TwoCharacters]: "iiiiii",
+  [WeekdayFormatOptions.ThreeCharacters]: "iii",
+  [WeekdayFormatOptions.AllCharacters]: "iiii",
+};
+
 const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
   // we use our custom hook `useState` which exposes our component state
   // and a function to update the `activeDate`
@@ -31,8 +38,8 @@ const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
     state: {
       activeDate,
       displayDate,
-      showWeekNumber,
-      printLongWeekdays,
+      calendarType,
+      weekdayFormat,
       locale,
       start,
       end,
@@ -47,10 +54,12 @@ const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
   // actual day names, so we get a new array that looks like this:
   // `["monday", "tuesday", ...]` which we then return instead of the array of
   // date objects.
+
+  console.log(weekdayFormats[weekdayFormat], weekdayFormats, weekdayFormat);
   const dayNames: string[] = eachDayOfInterval({
     start: startOfWeek(new Date()),
     end: endOfWeek(new Date()),
-  }).map((day) => format(day, printLongWeekdays ? "iiii" : "iii", { locale }));
+  }).map((day) => format(day, weekdayFormats[weekdayFormat], { locale }));
 
   // we take an array of Date objects for each week within our wanted month.
   // So it looks something like this: [`Date`, `Date`, `Date`, `Date`]
@@ -92,22 +101,29 @@ const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
           }}
         >
           <table>
-            <thead>
-              <tr>
-                {showWeekNumber && <th scope="column">{weekLabel}</th>}
-                {dayNames.map((day) => (
-                  <th key={day} scope="column">
-                    {day}
-                  </th>
-                ))}
-              </tr>
-            </thead>
+            {calendarType !== CalendarType.WithoutWeekNumberAndDayName && (
+              <thead>
+                <tr>
+                  {calendarType !== CalendarType.WithoutWeekNumber && (
+                    <th scope="column">{weekLabel}</th>
+                  )}
+                  {calendarType !== CalendarType.WithoutDayName &&
+                    dayNames.map((day) => (
+                      <th key={day} scope="column">
+                        {day}
+                      </th>
+                    ))}
+                </tr>
+              </thead>
+            )}
             <tbody>
               {daysOfMonthByWeek.map((daysOfWeek) => (
                 <tr key={getWeek(daysOfWeek[0])}>
-                  {showWeekNumber && (
-                    <th scope="row">{getWeek(daysOfWeek[0])}</th>
-                  )}
+                  {calendarType !== CalendarType.WithoutWeekNumber &&
+                    calendarType !==
+                      CalendarType.WithoutWeekNumberAndDayName && (
+                      <th scope="row">{getWeek(daysOfWeek[0])}</th>
+                    )}
                   {daysOfWeek.map((day) => (
                     <td key={getDay(day)}>
                       <button
