@@ -1,6 +1,5 @@
-import { useContext } from "react";
+import { useContext, createContext, Dispatch } from "react";
 import { sv } from "date-fns/locale";
-import { DatePickerContext } from "./DatePickerContext";
 
 export type DatePickerState = {
   start: Date;
@@ -9,13 +8,11 @@ export type DatePickerState = {
   displayDate: Date;
   activeDate?: Date;
   showWeekNumber: boolean;
-  transitions: boolean;
   printLongWeekdays: boolean;
 };
 
 // These are the current possible actions we can perform on our state
 export enum ActionTypes {
-  Reset = "RESET",
   SetDisplayDate = "SET_DISPLAY_DATE",
   SetActiveDate = "SET_ACTIVE_DATE",
 }
@@ -25,12 +22,6 @@ export enum ActionTypes {
 // different expected types based on certain values.
 // So depending on what "type" of action you want to perform
 // the typechecker knows which "payload" to expect.
-
-// The reset action is used to reset all the datepicker props to new values
-type ActionReset = {
-  type: ActionTypes.Reset;
-  payload: DatePickerState;
-};
 
 // The setDisplayDate action is used to set the current displayDate
 type ActionSetDisplayDate = {
@@ -49,10 +40,7 @@ type ActionSetActiveDate = {
 };
 
 // combine all our action types to one union action type.
-export type DatePickerAction =
-  | ActionReset
-  | ActionSetDisplayDate
-  | ActionSetActiveDate;
+export type DatePickerAction = ActionSetDisplayDate | ActionSetActiveDate;
 
 // the default state of our app, will most likely always be overwritten
 export const datePickerIntitialState: DatePickerState = {
@@ -62,7 +50,6 @@ export const datePickerIntitialState: DatePickerState = {
   locale: sv,
   showWeekNumber: true,
   printLongWeekdays: false,
-  transitions: false,
   activeDate: undefined,
 };
 
@@ -84,11 +71,6 @@ export const datePickerReducer = (
   // we wanted. But we have not mutated the previous version of the state. So that
   // is still accessible to us. If we want to do something with it.
   switch (action.type) {
-    case ActionTypes.Reset:
-      return {
-        ...state,
-        ...action.payload,
-      };
     case ActionTypes.SetDisplayDate:
       return {
         ...state,
@@ -104,16 +86,32 @@ export const datePickerReducer = (
   }
 };
 
-// a hook that simplifies the use of our state reducer and access to our state.
-export const useState = () => {
-  // get the state and dispatch values from our DatePickerContext
-  const { state, dispatch } = useContext(DatePickerContext);
+// We create two contexts for our state management, one for our state object
+// and one for our event dispatcher. Based on: https://kentcdodds.com/blog/how-to-use-react-context-effectively
+export const DatePickerStateContext = createContext<DatePickerState>(
+  datePickerIntitialState
+);
 
-  // a helper method for resetting the state of state with new values
-  // that we provide in form of a DatePickerState object.
-  const reset = (payload: DatePickerState): void => {
-    dispatch({ type: ActionTypes.Reset, payload });
-  };
+export const DatePickerDispatchContext = createContext<
+  Dispatch<DatePickerAction>
+>(() => null);
+
+// a simple hook that gives us our current state object
+export const useDatePickerState = (): DatePickerState => {
+  const state = useContext(DatePickerStateContext);
+
+  return state;
+};
+
+type DatePickerDispatches = {
+  setDisplayDate: (displayDate: Date) => void;
+  setActiveDate: (activeDate: Date) => void;
+};
+
+// a hook that handles our state
+export const useDatePickerDispatch = (): DatePickerDispatches => {
+  // get the state and dispatch values from our DatePickerContext
+  const dispatch = useContext(DatePickerDispatchContext);
 
   // a helper method for setting the display date (the current visible month).
   const setDisplayDate = (displayDate: Date): void => {
@@ -125,5 +123,10 @@ export const useState = () => {
     dispatch({ type: ActionTypes.SetActiveDate, payload: { activeDate } });
   };
 
-  return { state, reset, setDisplayDate, setActiveDate };
+  return { setDisplayDate, setActiveDate };
+};
+
+// a hook that simplifies the use of our state reducer and access to our state.
+export const useState = (): [DatePickerState, DatePickerDispatches] => {
+  return [useDatePickerState(), useDatePickerDispatch()];
 };

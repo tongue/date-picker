@@ -34,10 +34,7 @@ const Controls: FC<ControlsProps> = ({
 }) => {
   // we use our custom hook `useState` which exposes our component state
   // and a function to update the `displayDate`
-  const {
-    state: { displayDate, start, end, locale },
-    setDisplayDate,
-  } = useState();
+  const [{ displayDate, start, end, locale }, { setDisplayDate }] = useState();
 
   // take all years within the interval of our start and end dates.
   // iterate (map) over that and describe our select options with it.
@@ -65,6 +62,9 @@ const Controls: FC<ControlsProps> = ({
     disabled: !isWithinInterval(month, monthInterval),
     children: format(month, "MMMM", { locale }),
   }));
+
+  const isWithinMonth = (date: Date): Boolean =>
+    isWithinInterval(date, monthInterval);
 
   const onYearChange = (event: React.SyntheticEvent<HTMLSelectElement>) => {
     setDisplayDate(
@@ -94,7 +94,7 @@ const Controls: FC<ControlsProps> = ({
       <button
         value={Month.Decrement}
         onClick={onButtonClick}
-        disabled={!isWithinInterval(subMonths(displayDate, 1), monthInterval)}
+        disabled={!isWithinMonth(subMonths(displayDate, 1))}
       >
         {previousMonthLabel}
       </button>
@@ -114,7 +114,7 @@ const Controls: FC<ControlsProps> = ({
       <button
         value={Month.Increment}
         onClick={onButtonClick}
-        disabled={!isWithinInterval(addMonths(displayDate, 1), monthInterval)}
+        disabled={!isWithinMonth(addMonths(displayDate, 1))}
       >
         {nextMonthLabel}
       </button>

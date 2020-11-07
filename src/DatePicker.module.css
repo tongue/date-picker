@@ -2,36 +2,10 @@
   font-family: sans-serif;
 }
 
-.Calendar {
-  overflow: hidden;
-  position: relative;
-}
-
 .Day__current {
   color: green;
 }
 
 .Day__active {
   color: hotpink;
-}
-
-.fadeEnter {
-  opacity: 0;
-}
-
-.fadeEnterActive {
-  opacity: 1;
-  transition: opacity 500ms ease-in;
-}
-
-.fadeExit {
-  opacity: 1;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.fadeExitActive {
-  opacity: 0;
-  transition: opacity 500ms ease-out;
 }

@@ -16,7 +16,6 @@ import {
   endOfDay,
   isSameDay,
 } from "date-fns";
-import { TransitionGroup, CSSTransition } from "react-transition-group";
 import classNames from "classnames";
 import styles from "./DatePicker.module.css";
 
@@ -27,8 +26,8 @@ interface CalendarProps {
 const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
   // we use our custom hook `useState` which exposes our component state
   // and a function to update the `activeDate`
-  const {
-    state: {
+  const [
+    {
       activeDate,
       displayDate,
       showWeekNumber,
@@ -36,10 +35,9 @@ const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
       locale,
       start,
       end,
-      transitions,
     },
-    setActiveDate,
-  } = useState();
+    { setActiveDate },
+  ] = useState();
 
   // we take an array of Date objects for each day within a the current week,
   // So it looks like this: `[Date, Date, ...]`
@@ -69,72 +67,48 @@ const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
     setActiveDate(setDay(displayDate, parseInt(event.currentTarget.value, 10)));
   };
 
-  // this function ensures that when a transition is complete the CSSTransition
-  // component knows it.
-  const onTransitionEnd = (node: HTMLElement, done: () => void) => {
-    node.addEventListener("transitionend", done, false);
-  };
-
   return (
-    <div className={styles.Calendar}>
-      <TransitionGroup component={null}>
-        <CSSTransition
-          key={displayDate.getTime()}
-          addEndListener={onTransitionEnd}
-          timeout={500}
-          enter={transitions}
-          exit={transitions}
-          classNames={{
-            enter: styles.fadeEnter,
-            enterActive: styles.fadeEnterActive,
-            exit: styles.fadeExit,
-            exitActive: styles.fadeExitActive,
-          }}
-        >
-          <table>
-            <thead>
-              <tr>
-                {showWeekNumber && <th scope="column">{weekLabel}</th>}
-                {dayNames.map((day) => (
-                  <th key={day} scope="column">
-                    {day}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {daysOfMonthByWeek.map((daysOfWeek) => (
-                <tr key={getWeek(daysOfWeek[0])}>
-                  {showWeekNumber && (
-                    <th scope="row">{getWeek(daysOfWeek[0])}</th>
-                  )}
-                  {daysOfWeek.map((day) => (
-                    <td key={getDay(day)}>
-                      <button
-                        className={classNames({
-                          [styles.Day__current]: isSameDay(day, new Date()),
-                          [styles.Day__active]:
-                            activeDate && isSameDay(day, activeDate),
-                        })}
-                        onClick={onClick}
-                        value={getDay(day)}
-                        disabled={
-                          !isWithinInterval(day, {
-                            start: startOfDay(start),
-                            end: endOfDay(end),
-                          })
-                        }
-                      >
-                        {format(day, "d")}
-                      </button>
-                    </td>
-                  ))}
-                </tr>
+    <div>
+      <table>
+        <thead>
+          <tr>
+            {showWeekNumber && <th scope="column">{weekLabel}</th>}
+            {dayNames.map((day) => (
+              <th key={day} scope="column">
+                {day}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {daysOfMonthByWeek.map((daysOfWeek) => (
+            <tr key={getWeek(daysOfWeek[0])}>
+              {showWeekNumber && <th scope="row">{getWeek(daysOfWeek[0])}</th>}
+              {daysOfWeek.map((day) => (
+                <td key={getDay(day)}>
+                  <button
+                    className={classNames({
+                      [styles.Day__current]: isSameDay(day, new Date()),
+                      [styles.Day__active]:
+                        activeDate && isSameDay(day, activeDate),
+                    })}
+                    onClick={onClick}
+                    value={getDay(day)}
+                    disabled={
+                      !isWithinInterval(day, {
+                        start: startOfDay(start),
+                        end: endOfDay(end),
+                      })
+                    }
+                  >
+                    {format(day, "d")}
+                  </button>
+                </td>
               ))}
-            </tbody>
-          </table>
-        </CSSTransition>
-      </TransitionGroup>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

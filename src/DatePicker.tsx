@@ -1,8 +1,11 @@
 import React, { useEffect, useReducer } from "react";
 import { Locale } from "date-fns";
 import { sv } from "date-fns/locale";
-import { DatePickerContext } from "./DatePickerContext";
-import { datePickerReducer } from "./state";
+import {
+  datePickerReducer,
+  DatePickerStateContext,
+  DatePickerDispatchContext,
+} from "./state";
 import Controls from "./Controls";
 import Calendar from "./Calendar";
 import styles from "./DatePicker.module.css";
@@ -36,10 +39,6 @@ export interface DatePickerProps {
    */
   showWeekNumber: boolean;
   /**
-   * Use transitions or not
-   */
-  transitions: boolean;
-  /**
    * Label for next month button
    */
   nextMonthLabel: string;
@@ -63,7 +62,6 @@ const DatePicker: React.FC<DatePickerProps> = ({
   nextMonthLabel = "Nästa månad",
   previousMonthLabel = "Föregående månad",
   weekLabel = "V.",
-  transitions = false,
 }) => {
   // initialize our state manangement with the passed in props that is part
   // of the actual state
@@ -74,7 +72,6 @@ const DatePicker: React.FC<DatePickerProps> = ({
     locale,
     printLongWeekdays,
     showWeekNumber,
-    transitions,
     activeDate: undefined,
   });
 
@@ -87,15 +84,17 @@ const DatePicker: React.FC<DatePickerProps> = ({
   }, [state.activeDate, onChange]);
 
   return (
-    <DatePickerContext.Provider value={{ state, dispatch }}>
-      <div className={styles.DatePicker}>
-        <Controls
-          nextMonthLabel={nextMonthLabel}
-          previousMonthLabel={previousMonthLabel}
-        />
-        <Calendar weekLabel={weekLabel} />
-      </div>
-    </DatePickerContext.Provider>
+    <DatePickerStateContext.Provider value={state}>
+      <DatePickerDispatchContext.Provider value={dispatch}>
+        <div className={styles.DatePicker}>
+          <Controls
+            nextMonthLabel={nextMonthLabel}
+            previousMonthLabel={previousMonthLabel}
+          />
+          <Calendar weekLabel={weekLabel} />
+        </div>
+      </DatePickerDispatchContext.Provider>
+    </DatePickerStateContext.Provider>
   );
 };
 
