@@ -1,12 +1,7 @@
 import React from "react";
-// also exported from '@storybook/react' if you can deal with breaking changes in 6.1
-import { Story, Meta } from "@storybook/react/types-6-0";
+import { Story, Meta } from "@storybook/react";
 
-import DatePicker, {
-  DatePickerProps,
-  CalendarType,
-  WeekdayFormatOptions,
-} from ".";
+import DatePicker, { DatePickerProps, CalendarTypes, WeekdayFormats } from ".";
 import { enUS } from "date-fns/locale";
 import { addYears } from "date-fns";
 
@@ -22,22 +17,51 @@ const Template: Story<DatePickerProps> = (args) => <DatePicker {...args} />;
 
 export const Default = Template.bind({});
 
-export const HideWeekNumber = Template.bind({});
-HideWeekNumber.args = {
-  calendarType: CalendarType.WithoutWeekNumber,
+export const WithoutWeekNumber = Template.bind({});
+WithoutWeekNumber.args = {
+  calendarType: CalendarTypes.WithoutWeekNumber,
 };
 
-export const PrintLongWeekdays = Template.bind({});
-PrintLongWeekdays.args = {
-  weekdayFormat: WeekdayFormatOptions.AllCharacters,
+export const WithoutDayName = Template.bind({});
+WithoutDayName.args = {
+  calendarType: CalendarTypes.WithoutDayName,
+};
+
+export const WithoutWeekNumberAndDayName = Template.bind({});
+WithoutWeekNumberAndDayName.args = {
+  calendarType: CalendarTypes.WithoutWeekNumberAndDayName,
+};
+
+export const OneCharacterWeekday = Template.bind({});
+OneCharacterWeekday.args = {
+  weekdayFormat: WeekdayFormats.OneCharacter,
+};
+
+export const TwoCharactersWeekday = Template.bind({});
+TwoCharactersWeekday.args = {
+  weekdayFormat: WeekdayFormats.TwoCharacters,
+};
+
+export const ThreeCharactersWeekdays = Template.bind({});
+ThreeCharactersWeekdays.args = {
+  weekdayFormat: WeekdayFormats.ThreeCharacters,
 };
 
 export const EnglishLocale = Template.bind({});
 EnglishLocale.args = {
-  locale: enUS,
-  nextMonthLabel: "Next month",
-  previousMonthLabel: "Previous month",
-  weekLabel: "W.",
+  locale: {
+    nextMonth: "Next month",
+    previousMonth: "Previous month",
+    week: "Week",
+    dateFns: enUS,
+  },
+};
+
+export const ShortWeekLabel = Template.bind({});
+ShortWeekLabel.args = {
+  locale: {
+    week: "V.",
+  },
 };
 
 export const StartDate1YearInFuture = Template.bind({});
@@ -49,8 +73,3 @@ export const EndDateToday = Template.bind({});
 EndDateToday.args = {
   end: new Date(),
 };
-
-/* export const WithTransitions = Template.bind({}); */
-/* WithTransitions.args = { */
-/*   transitions: true, */
-/* }; */

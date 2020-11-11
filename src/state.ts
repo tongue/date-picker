@@ -1,41 +1,15 @@
 import { useContext, createContext, Dispatch } from "react";
-import { sv } from "date-fns/locale";
 
-export enum WeekdayFormatOptions {
-  OneCharacter = "ONE_CHARACTER",
-  TwoCharacters = "TWO_CHARACTERS",
-  ThreeCharacters = "THREE_CHARACTERS",
-  AllCharacters = "ALL_CHARACTERS",
-}
-
-export type WeekdayFormat =
-  | "ONE_CHARACTER"
-  | "TWO_CHARACTERS"
-  | "THREE_CHARACTERS"
-  | "ALL_CHARACTERS";
+export type DatePickerState = {
+  displayDate: Date;
+  activeDate?: Date;
+};
 
 // These are the current possible actions we can perform on our state
 export enum ActionTypes {
   SetDisplayDate = "SET_DISPLAY_DATE",
   SetActiveDate = "SET_ACTIVE_DATE",
 }
-
-export enum CalendarType {
-  Default,
-  WithoutWeekNumber,
-  WithoutDayName,
-  WithoutWeekNumberAndDayName,
-}
-
-export type DatePickerState = {
-  start: Date;
-  end: Date;
-  locale: Locale;
-  displayDate: Date;
-  activeDate?: Date;
-  calendarType: CalendarType;
-  weekdayFormat: WeekdayFormat;
-};
 
 // In our actions we use whats called "Discriminating Unions".
 // Which in its simples form is a type check where we can set
@@ -65,11 +39,6 @@ export type DatePickerAction = ActionSetDisplayDate | ActionSetActiveDate;
 // the default state of our app, will most likely always be overwritten
 export const datePickerIntitialState: DatePickerState = {
   displayDate: new Date(),
-  start: new Date(),
-  end: new Date(),
-  locale: sv,
-  calendarType: CalendarType.Default,
-  weekdayFormat: "ALL_CHARACTERS",
   activeDate: undefined,
 };
 
@@ -107,7 +76,8 @@ export const datePickerReducer = (
 };
 
 // We create two contexts for our state management, one for our state object
-// and one for our event dispatcher. Based on: https://kentcdodds.com/blog/how-to-use-react-context-effectively
+// and one for our event dispatcher.
+// Based on: https://kentcdodds.com/blog/how-to-use-react-context-effectively
 export const DatePickerStateContext = createContext<DatePickerState>(
   datePickerIntitialState
 );

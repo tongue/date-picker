@@ -1,81 +1,59 @@
-import React, { useEffect, useReducer, Component } from "react";
-import { Locale } from "date-fns";
-import { sv } from "date-fns/locale";
+import React, { useEffect, useReducer } from "react";
+import { Locale } from "./locale";
 import {
   DatePickerStateContext,
   DatePickerDispatchContext,
   datePickerReducer,
-  WeekdayFormat,
-  WeekdayFormatOptions,
-  CalendarType,
 } from "./state";
+import {
+  WeekdayFormat,
+  CalendarType,
+  datePickerDefaultOptions,
+  DatePickerOptionsContext,
+  DatePickerOptions,
+} from "./options";
 import Controls from "./Controls";
 import Calendar from "./Calendar";
 import styles from "./DatePicker.module.css";
+import { deepmerge, filterUndefinedProperties } from "./utils";
 
 export interface DatePickerProps {
   /**
-   * Change handler, fires everytime a new date
-   * is selected.
+   * Change handler, fires everytime a new date is selected.
    */
   onChange: (date: Date) => void;
   /**
-   * First selectable date
+   * First selectable date. Defaults to todays date.
    */
-  start: Date;
+  start?: Date;
   /**
-   * Last selectable date
+   * Last selectable date. Defaults to todays date plus 5 years
    */
-  end: Date;
+  end?: Date;
   /**
-   * A `date-fns` locale object, which handles all
-   * the translations of date names and layout
-   * of a week. Defaults to Swedish.
+   * A object with for translations and format of static texts
    */
-  locale: Locale;
+  locale?: Locale;
   /**
-   * Print long weekday names in the week grid
+   * Weekday name format. Defaults to full weekday names.
    */
-  weekdayFormat: WeekdayFormat;
+  weekdayFormat?: WeekdayFormat;
   /**
-   * Hide week numbers in the month grid
+   * Type of calendar. Defaults to everything visible
+   *  TODO: Maybe calendarLabels ROW | COLUMN | ROW|COLUMN[]
    */
-  calendarType: CalendarType;
-  /**
-   * Label for next month button
-   */
-  nextMonthLabel: string;
-  /**
-   * Label for previous month button
-   */
-  previousMonthLabel: string;
-  /**
-   * Label week column in calendar
-   */
-  weekLabel: string;
+  calendarType?: CalendarType;
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({
-  onChange,
-  start = new Date(),
-  end = new Date(new Date().setFullYear(new Date().getFullYear() + 5)),
-  locale = sv,
-  weekdayFormat = "ALL_CHARACTERS",
-  calendarType = CalendarType.Default,
-  nextMonthLabel = "Nästa månad",
-  previousMonthLabel = "Föregående månad",
-  weekLabel = "V.",
-}) => {
-  // initialize our state manangement with the passed in props that is part
-  // of the actual state
+const DatePicker: React.VFC<DatePickerProps> = ({ onChange, ...props }) => {
+  // merge the initialstate with our incoming props
+  const options: DatePickerOptions = deepmerge(
+    datePickerDefaultOptions,
+    filterUndefinedProperties(props)
+  );
+
   const [state, dispatch] = useReducer(datePickerReducer, {
-    displayDate: start,
-    start,
-    end,
-    locale,
-    weekdayFormat,
-    calendarType,
-    activeDate: undefined,
+    displayDate: options.start,
   });
 
   // if activeDate ever changes and it's changed to a value that is not
@@ -87,17 +65,16 @@ const DatePicker: React.FC<DatePickerProps> = ({
   }, [state.activeDate, onChange]);
 
   return (
-    <DatePickerStateContext.Provider value={state}>
-      <DatePickerDispatchContext.Provider value={dispatch}>
-        <div className={styles.DatePicker}>
-          <Controls
-            nextMonthLabel={nextMonthLabel}
-            previousMonthLabel={previousMonthLabel}
-          />
-          <Calendar weekLabel={weekLabel} />
-        </div>
-      </DatePickerDispatchContext.Provider>
-    </DatePickerStateContext.Provider>
+    <DatePickerOptionsContext.Provider value={options}>
+      <DatePickerStateContext.Provider value={state}>
+        <DatePickerDispatchContext.Provider value={dispatch}>
+          <div className={styles.DatePicker}>
+            <Controls />
+            <Calendar />
+          </div>
+        </DatePickerDispatchContext.Provider>
+      </DatePickerStateContext.Provider>
+    </DatePickerOptionsContext.Provider>
   );
 };
 

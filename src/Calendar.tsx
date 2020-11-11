@@ -1,5 +1,6 @@
 import React, { FC } from "react";
-import { useState, CalendarType, WeekdayFormatOptions } from "./state";
+import { useState } from "./state";
+import { useOptions, CalendarTypes, WeekdayFormats } from "./options";
 import {
   setDay,
   getDay,
@@ -19,32 +20,18 @@ import {
 import classNames from "classnames";
 import styles from "./DatePicker.module.css";
 
-interface CalendarProps {
-  weekLabel: string;
-}
-
 const weekdayFormats = {
-  [WeekdayFormatOptions.OneCharacter]: "iiiii",
-  [WeekdayFormatOptions.TwoCharacters]: "iiiiii",
-  [WeekdayFormatOptions.ThreeCharacters]: "iii",
-  [WeekdayFormatOptions.AllCharacters]: "iiii",
+  [WeekdayFormats.OneCharacter]: "iiiii",
+  [WeekdayFormats.TwoCharacters]: "iiiiii",
+  [WeekdayFormats.ThreeCharacters]: "iii",
+  [WeekdayFormats.AllCharacters]: "iiii",
 };
 
-const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
-  // we use our custom hook `useState` which exposes our component state
-  // and a function to update the `activeDate`
-  const [
-    {
-      activeDate,
-      displayDate,
-      calendarType,
-      weekdayFormat,
-      locale,
-      start,
-      end,
-    },
-    { setActiveDate },
-  ] = useState();
+const Calendar: FC = () => {
+  // we use our custom hook `useState` which exposes our component state and a
+  // function to update the `activeDate`
+  const [{ activeDate, displayDate }, { setActiveDate }] = useState();
+  const { calendarType, weekdayFormat, locale, start, end } = useOptions();
 
   // we take an array of Date objects for each day within a the current week,
   // So it looks like this: `[Date, Date, ...]`
@@ -52,12 +39,12 @@ const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
   // actual day names, so we get a new array that looks like this:
   // `["monday", "tuesday", ...]` which we then return instead of the array of
   // date objects.
-
-  console.log(weekdayFormats[weekdayFormat], weekdayFormats, weekdayFormat);
   const dayNames: string[] = eachDayOfInterval({
     start: startOfWeek(new Date()),
     end: endOfWeek(new Date()),
-  }).map((day) => format(day, weekdayFormats[weekdayFormat], { locale }));
+  }).map((day) =>
+    format(day, weekdayFormats[weekdayFormat], { locale: locale.dateFns })
+  );
 
   // we take an array of Date objects for each week within our wanted month.
   // So it looks something like this: [`Date`, `Date`, `Date`, `Date`]
@@ -79,15 +66,15 @@ const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
   return (
     <div>
       <table>
-        {calendarType !== CalendarType.WithoutWeekNumberAndDayName && (
+        {calendarType !== CalendarTypes.WithoutWeekNumberAndDayName && (
           <thead>
             <tr>
-              {calendarType !== CalendarType.WithoutWeekNumber && (
-                <th scope="column">{weekLabel}</th>
+              {calendarType !== CalendarTypes.WithoutWeekNumber && (
+                <th scope="column">{locale.week}</th>
               )}
-              {calendarType !== CalendarType.WithoutDayName &&
-                dayNames.map((day) => (
-                  <th key={day} scope="column">
+              {calendarType !== CalendarTypes.WithoutDayName &&
+                dayNames.map((day, index) => (
+                  <th key={day + index} scope="column">
                     {day}
                   </th>
                 ))}
@@ -97,8 +84,8 @@ const Calendar: FC<CalendarProps> = ({ weekLabel }) => {
         <tbody>
           {daysOfMonthByWeek.map((daysOfWeek) => (
             <tr key={getWeek(daysOfWeek[0])}>
-              {calendarType !== CalendarType.WithoutWeekNumber &&
-                calendarType !== CalendarType.WithoutWeekNumberAndDayName && (
+              {calendarType !== CalendarTypes.WithoutWeekNumber &&
+                calendarType !== CalendarTypes.WithoutWeekNumberAndDayName && (
                   <th scope="row">{getWeek(daysOfWeek[0])}</th>
                 )}
               {daysOfWeek.map((day) => (
